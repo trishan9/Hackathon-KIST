@@ -4,21 +4,22 @@
   import PollForm from "./lib/PollForm.svelte";
   import PollList from "./lib/PollList.svelte";
   import Tabs from "./lib/Tabs.svelte";
+  import { activeTabStore } from "./stores";
 
   let tabItems = ["Current Polls", "Add New Poll"];
-  let activeTab = "Current Polls";
 
-  $: activeTabComponent = activeTab === "Current Polls" ? PollList : PollForm;
+  $: activeTabComponent =
+    $activeTabStore === "Current Polls" ? PollList : PollForm;
 
   const onTabChange = (e: CustomEvent<any>) => {
-    activeTab = e.detail;
+    activeTabStore.set(e.detail);
   };
 </script>
 
 <Header />
 
 <main>
-  <Tabs on:tab-change={onTabChange} {tabItems} {activeTab} />
+  <Tabs on:tab-change={onTabChange} {tabItems} activeTab={$activeTabStore} />
   <svelte:component this={activeTabComponent} />
 </main>
 

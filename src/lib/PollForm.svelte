@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { activeTabStore, pollsStore } from "../stores";
   import Button from "./Button.svelte";
 
   let formFields = {
@@ -41,8 +42,14 @@
   };
 
   const onAddPoll = () => {
+    isValid = true;
     if (validateForm()) {
-      console.log(formFields);
+      const poll = { ...formFields, votesA: 0, votesB: 0, id: Math.random() };
+      pollsStore.update((data) => {
+        return [...data, poll];
+      });
+      pollsStore.subscribe((data) => console.log(data));
+      activeTabStore.set("Current Polls");
     }
   };
 </script>
