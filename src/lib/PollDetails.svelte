@@ -1,9 +1,26 @@
 <script lang="ts">
+  import { pollsStore } from "../stores";
   import Card from "./Card.svelte";
 
   export let poll;
 
   $: totalVotes = poll.votesA + poll.votesB;
+
+  const handleCastVote = (option: String, poll: any) => {
+    pollsStore.update((data) => {
+      return data.filter((d) => d.id != poll.id);
+    });
+
+    if (option == "a") {
+      poll.votesA += 1;
+    } else if (option == "b") {
+      poll.votesB += 1;
+    }
+
+    pollsStore.update((data) => {
+      return [...data, poll];
+    });
+  };
 </script>
 
 <Card>
@@ -12,13 +29,13 @@
 
     <p>Total Votes: {totalVotes}</p>
 
-    <div class="answer">
+    <div class="answer" on:click={() => handleCastVote("a", poll)}>
       <div class="percent percent-a"></div>
 
       <span>{poll.answerA} ({poll.votesA}) </span>
     </div>
 
-    <div class="answer">
+    <div class="answer" on:click={() => handleCastVote("b", poll)}>
       <div class="percent percent-b"></div>
 
       <span>{poll.answerB} ({poll.votesB}) </span>
