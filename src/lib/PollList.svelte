@@ -1,10 +1,13 @@
 <script lang="ts">
   import { pollsStore } from "../stores";
+  import PollDetails from "./PollDetails.svelte";
 </script>
 
 <div class="poll-list">
   {#each $pollsStore as poll (poll.id)}
-    <div>{poll.question}</div>
+    <div>
+      <PollDetails {poll} />
+    </div>
   {:else}
     <p>No any polls to show...</p>
   {/each}
