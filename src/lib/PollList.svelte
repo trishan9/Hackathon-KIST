@@ -1,11 +1,13 @@
 <script lang="ts">
+  import { fade, scale } from "svelte/transition";
   import { pollsStore } from "../stores";
   import PollDetails from "./PollDetails.svelte";
+  import { flip } from "svelte/animate";
 </script>
 
 <div class="poll-list">
   {#each $pollsStore as poll (poll.id)}
-    <div>
+    <div in:fade out:scale|local animate:flip={{ duration: 500 }}>
       <PollDetails {poll} />
     </div>
   {:else}

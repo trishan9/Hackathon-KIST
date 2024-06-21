@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { tweened } from "svelte/motion";
   import { pollsStore } from "../stores";
   import Button from "./Button.svelte";
   import Card from "./Card.svelte";
@@ -6,22 +7,27 @@
   export let poll;
 
   $: totalVotes = poll.votesA + poll.votesB;
-  $: percentA = Math.floor((poll.votesA / totalVotes) * 100);
-  $: percentB = Math.floor((poll.votesB / totalVotes) * 100);
+  $: percentA = Math.floor((poll.votesA / totalVotes) * 100) || 0;
+  $: percentB = Math.floor((poll.votesB / totalVotes) * 100) || 0;
 
-  const handleCastVote = (option: String, poll: any) => {
+  const tweenedA = tweened(0);
+  const tweenedB = tweened(0);
+
+  $: tweenedA.set(percentA);
+  $: tweenedB.set(percentB);
+
+  const handleCastVote = (option: String, pollId: number) => {
     pollsStore.update((data) => {
-      return data.filter((d) => d.id != poll.id);
-    });
+      let copiedPolls = [...data];
+      let currentPoll = copiedPolls.find((poll) => poll.id == pollId)!;
 
-    if (option == "a") {
-      poll.votesA += 1;
-    } else if (option == "b") {
-      poll.votesB += 1;
-    }
-
-    pollsStore.update((data) => {
-      return [...data, poll];
+      if (option == "a") {
+        currentPoll.votesA++;
+      }
+      if (option == "b") {
+        currentPoll.votesB++;
+      }
+      return copiedPolls;
     });
   };
 
@@ -38,14 +44,14 @@
 
     <p>Total Votes: {totalVotes}</p>
 
-    <div class="answer" on:click={() => handleCastVote("a", poll)}>
-      <div class="percent percent-a" style="width: {percentA}%;"></div>
+    <div class="answer" on:click={() => handleCastVote("a", poll.id)}>
+      <div class="percent percent-a" style="width: {$tweenedA}%;"></div>
 
       <span>{poll.answerA} ({poll.votesA}) </span>
     </div>
 
-    <div class="answer" on:click={() => handleCastVote("b", poll)}>
-      <div class="percent percent-b" style="width: {percentB}%;"></div>
+    <div class="answer" on:click={() => handleCastVote("b", poll.id)}>
+      <div class="percent percent-b" style="width: {$tweenedB}%;"></div>
 
       <span>{poll.answerB} ({poll.votesB}) </span>
     </div>
